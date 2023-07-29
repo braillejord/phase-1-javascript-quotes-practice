@@ -7,6 +7,7 @@ fetchQuotes()
 
 // render quotes on page
 function fetchQuotes() {
+    quoteList.innerText = ''
     fetch(quotesAndLikesUrl)
     .then(r => r.json())
     .then(data => data.forEach((singleQuote) => renderQuote(singleQuote)))
@@ -38,6 +39,10 @@ function renderQuote(singleQuote) {
     const deleteBtn = document.createElement('button')
     deleteBtn.classList.add('btn-danger')
     deleteBtn.innerText = 'Delete ❌'
+    deleteBtn.onclick = (e) => {
+        e.preventDefault()
+        removeQuote(singleQuote.id)
+    }   
 
     blockquote.append(quote, footer, br, likeBtn, deleteBtn)
     
@@ -50,7 +55,7 @@ function renderQuote(singleQuote) {
 // submit form to create new quote and add to list
 const newQuoteForm = document.getElementById('new-quote-form')
 newQuoteForm.onsubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault(),
     renderNewQuote()
 }
 
@@ -69,6 +74,13 @@ function renderNewQuote() {
             author: newQuoteAuthor
         })
     })
-    quoteList.innerText = ''
+    fetchQuotes()
+}
+
+// delete quote from database and page
+function removeQuote(quoteId) {
+    fetch(quotesUrl + '/' + quoteId, {
+        method: 'DELETE'
+    })
     fetchQuotes()
 }

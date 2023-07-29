@@ -1,13 +1,18 @@
-const quotesUrl = 'http://localhost:3000/quotes?_embed=likes'
+const quotesAndLikesUrl = 'http://localhost:3000/quotes?_embed=likes'
+const quotesUrl = 'http://localhost:3000/quotes'
 
-// populate page with quotes
-fetch(quotesUrl)
-.then(r => r.json())
-.then(data => data.forEach((singleQuote) => renderQuotes(singleQuote)))
+const quoteList = document.getElementById('quote-list')
 
-function renderQuotes(singleQuote) {
-    const quoteCard = document.createElement('li')
+fetchQuotes()
 
+// render quotes on page
+function fetchQuotes() {
+    fetch(quotesAndLikesUrl)
+    .then(r => r.json())
+    .then(data => data.forEach((singleQuote) => renderQuote(singleQuote)))
+}
+
+function renderQuote(singleQuote) {
     const blockquote = document.createElement('blockquote')
     blockquote.classList.add('blockquote')
 
@@ -35,7 +40,35 @@ function renderQuotes(singleQuote) {
     deleteBtn.innerText = 'Delete ❌'
 
     blockquote.append(quote, footer, br, likeBtn, deleteBtn)
+    
+    const quoteCard = document.createElement('li')
+    quoteCard.appendChild(blockquote)
 
-    const quoteList = document.getElementById('quote-list')
-    quoteList.append(blockquote)
+    quoteList.append(quoteCard)
+}
+
+// submit form to create new quote and add to list
+const newQuoteForm = document.getElementById('new-quote-form')
+newQuoteForm.onsubmit = (e) => {
+    e.preventDefault()
+    renderNewQuote()
+}
+
+function renderNewQuote() {
+    const newQuote = document.getElementById('new-quote').value
+    const newQuoteAuthor = document.getElementById('author').value
+
+    fetch(quotesUrl, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'accepts': 'application/json'
+        },
+        body: JSON.stringify({
+            quote: newQuote,
+            author: newQuoteAuthor
+        })
+    })
+    quoteList.innerText = ''
+    fetchQuotes()
 }

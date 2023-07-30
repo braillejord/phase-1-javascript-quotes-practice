@@ -88,7 +88,7 @@ function removeQuote(quoteId) {
     fetch(quotesUrl + '/' + quoteId, {
         method: 'DELETE'
     })
-    fetchQuotes()
+    .then(() => fetchQuotes())
 }
 
 // update likes

@@ -1,5 +1,6 @@
 const quotesAndLikesUrl = 'http://localhost:3000/quotes?_embed=likes'
 const quotesUrl = 'http://localhost:3000/quotes'
+const likesUrl = 'http://localhost:3000/likes'
 
 const quoteList = document.getElementById('quote-list')
 
@@ -30,9 +31,13 @@ function renderQuote(singleQuote) {
     const likeBtn = document.createElement('button')
     likeBtn.classList.add('btn-success')
     likeBtn.innerText = 'Likes: '
+    likeBtn.onclick = (e) => {
+        e.preventDefault()
+        addLike(singleQuote.id)
+    }   
 
     const likeCount = document.createElement('span')
-    likeCount.innerText = 0
+    likeCount.innerText = singleQuote.likes.length
 
     likeBtn.appendChild(likeCount)
 
@@ -57,6 +62,7 @@ const newQuoteForm = document.getElementById('new-quote-form')
 newQuoteForm.onsubmit = (e) => {
     e.preventDefault(),
     renderNewQuote()
+    newQuoteForm.reset()
 }
 
 function renderNewQuote() {
@@ -83,4 +89,19 @@ function removeQuote(quoteId) {
         method: 'DELETE'
     })
     fetchQuotes()
+}
+
+// update likes
+function addLike(quoteId) {
+    fetch(likesUrl, {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'accepts': 'application/json',
+        },
+        body: JSON.stringify({
+            quoteId: quoteId
+        })
+    })
+    .then(() => fetchQuotes())
 }
